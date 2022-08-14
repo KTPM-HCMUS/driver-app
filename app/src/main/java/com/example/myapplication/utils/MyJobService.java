@@ -3,9 +3,7 @@ package com.example.myapplication.utils;
 import android.app.job.JobParameters;
 import android.app.job.JobService;
 import android.os.PersistableBundle;
-import android.widget.Toast;
 
-import com.example.myapplication.MainActivity;
 import com.example.myapplication.api.ApiService;
 import com.example.myapplication.model.LocationDriver;
 import com.google.gson.Gson;
@@ -31,7 +29,7 @@ public class MyJobService extends JobService {
             public void run() {
                 Double longtitude = jobParameters.getExtras().getDouble("lon");
                 Double latitude = jobParameters.getExtras().getDouble("lat");
-                LocationDriver locationDriver = new LocationDriver(1, longtitude, latitude);
+                LocationDriver locationDriver = new LocationDriver(1, latitude, longtitude);
                 ApiService.apiService.updateLocationDriver(locationDriver).enqueue(new Callback<LocationDriver>() {
                     @Override
                     public void onResponse(Call<LocationDriver> call, Response<LocationDriver> response) {

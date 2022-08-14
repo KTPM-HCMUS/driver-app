@@ -1,7 +1,6 @@
-package com.example.myapplication;
+package com.example.myapplication.activities;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.core.app.ActivityCompat;
 import androidx.core.view.GravityCompat;
@@ -16,10 +15,9 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.PersistableBundle;
-import android.view.Gravity;
 import android.view.View;
-import android.widget.Switch;
 
+import com.example.myapplication.R;
 import com.example.myapplication.model.LocationDriver;
 import com.example.myapplication.utils.MyJobService;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -31,7 +29,6 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.gson.Gson;
 
 public class MainActivity extends FragmentActivity implements OnMapReadyCallback {

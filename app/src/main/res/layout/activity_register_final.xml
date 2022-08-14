@@ -34,26 +34,16 @@
         app:layout_constraintVertical_bias="0.205">
 
         <EditText
-            android:id="@+id/registerFinalEmailEditText"
+            android:id="@+id/phoneNumber"
             android:layout_width="306dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="40dp"
             android:background="#FFFFFF"
             android:ems="10"
-            android:hint="Email"
+            android:hint="Phone Number"
             android:inputType="textEmailAddress"
             android:padding="10dp" />
 
-        <EditText
-            android:id="@+id/driverName"
-            android:layout_width="306dp"
-            android:layout_height="wrap_content"
-            android:background="#FFFFFF"
-            android:layout_marginTop="20dp"
-            android:ems="10"
-            android:hint="Name"
-            android:inputType="textEmailAddress"
-            android:padding="10dp" />
 
         <EditText
             android:id="@+id/password"
@@ -67,47 +57,43 @@
             android:padding="10dp" />
 
         <EditText
-            android:id="@+id/confirmPassword"
+            android:id="@+id/name"
             android:layout_width="306dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="20sp"
             android:background="#FFFFFF"
             android:ems="10"
-            android:hint="Confirm Password"
-            android:inputType="textPassword"
+            android:hint="Name"
             android:padding="10dp" />
 
         <EditText
-            android:id="@+id/identification"
+            android:id="@+id/dob"
             android:layout_width="306dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="20sp"
             android:background="#FFFFFF"
             android:ems="10"
-            android:hint="Identification"
-            android:inputType="textPassword"
+            android:hint="Date Of Birth"
             android:padding="10dp" />
 
         <EditText
-            android:id="@+id/license"
+            android:id="@+id/email"
             android:layout_width="306dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="20sp"
             android:background="#FFFFFF"
             android:ems="10"
-            android:hint="Driver License"
-            android:inputType="textPassword"
+            android:hint="Email"
             android:padding="10dp" />
 
         <EditText
-            android:id="@+id/plate"
+            android:id="@+id/vehiclePlate"
             android:layout_width="306dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="20sp"
             android:background="#FFFFFF"
             android:ems="10"
-            android:hint="Plate"
-            android:inputType="textPassword"
+            android:hint="Vehicle Plate"
             android:padding="10dp" />
 
         <TextView
@@ -115,9 +101,10 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="20sp"
             android:textSize="16dp"
-            android:text="Vehicle type"/>
+            android:text="Vehicle plate"/>
         <RadioGroup
             android:layout_width="306dp"
+            android:id="@+id/rdoPlate"
             android:layout_height="wrap_content">
             <RadioButton
                 android:id="@+id/rdoMotorbike"
@@ -125,15 +112,10 @@
                 android:layout_height="wrap_content"
                 android:text="Motorbike"/>
             <RadioButton
-                android:id="@+id/rdo4SeaterCars"
+                android:id="@+id/rdoCar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="4 Seater Cars"/>
-            <RadioButton
-                android:id="@+id/rdo7SeaterCars"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="7 Seater Cars"/>
+                android:text="Car"/>
         </RadioGroup>
         <LinearLayout
             android:layout_width="match_parent"
