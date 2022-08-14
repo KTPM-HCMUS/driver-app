@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#EBFAFE">
+    <Button
+        android:id="@+id/registerFinalBackBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:backgroundTint="#2AC7FE"
+        android:text="Back"
+        android:textColor="#3CCCFE"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.205">
+
+        <EditText
+            android:id="@+id/registerFinalEmailEditText"
+            android:layout_width="306dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            android:background="#FFFFFF"
+            android:ems="10"
+            android:hint="Email"
+            android:inputType="textEmailAddress"
+            android:padding="10dp" />
+
+        <EditText
+            android:id="@+id/driverName"
+            android:layout_width="306dp"
+            android:layout_height="wrap_content"
+            android:background="#FFFFFF"
+            android:layout_marginTop="20dp"
+            android:ems="10"
+            android:hint="Name"
+            android:inputType="textEmailAddress"
+            android:padding="10dp" />
+
+        <EditText
+            android:id="@+id/password"
+            android:layout_width="306dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20sp"
+            android:background="#FFFFFF"
+            android:ems="10"
+            android:hint="Password"
+            android:inputType="textPassword"
+            android:padding="10dp" />
+
+        <EditText
+            android:id="@+id/confirmPassword"
+            android:layout_width="306dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20sp"
+            android:background="#FFFFFF"
+            android:ems="10"
+            android:hint="Confirm Password"
+            android:inputType="textPassword"
+            android:padding="10dp" />
+
+        <EditText
+            android:id="@+id/identification"
+            android:layout_width="306dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20sp"
+            android:background="#FFFFFF"
+            android:ems="10"
+            android:hint="Identification"
+            android:inputType="textPassword"
+            android:padding="10dp" />
+
+        <EditText
+            android:id="@+id/license"
+            android:layout_width="306dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20sp"
+            android:background="#FFFFFF"
+            android:ems="10"
+            android:hint="Driver License"
+            android:inputType="textPassword"
+            android:padding="10dp" />
+
+        <EditText
+            android:id="@+id/plate"
+            android:layout_width="306dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20sp"
+            android:background="#FFFFFF"
+            android:ems="10"
+            android:hint="Plate"
+            android:inputType="textPassword"
+            android:padding="10dp" />
+
+        <TextView
+            android:layout_width="306dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20sp"
+            android:textSize="16dp"
+            android:text="Vehicle type"/>
+        <RadioGroup
+            android:layout_width="306dp"
+            android:layout_height="wrap_content">
+            <RadioButton
+                android:id="@+id/rdoMotorbike"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Motorbike"/>
+            <RadioButton
+                android:id="@+id/rdo4SeaterCars"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="4 Seater Cars"/>
+            <RadioButton
+                android:id="@+id/rdo7SeaterCars"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="7 Seater Cars"/>
+        </RadioGroup>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"/>
+
+        <Button
+            android:id="@+id/registerFinalRegisterBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:backgroundTint="#2AC7FE"
+            android:padding="10dp"
+            android:text="Register"
+            android:textColor="#3CCCFE"
+            android:textSize="18sp" />
+
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
