@@ -6,6 +6,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.example.myapplication.model.Result;
+
 import java.util.ArrayList;
 
 public class DBHandler extends SQLiteOpenHelper {
@@ -13,6 +15,7 @@ public class DBHandler extends SQLiteOpenHelper {
     private static final String TABLE_NAME = "tokendb";
     private static final String REFRESH_TOKEN = "refresh_token";
     private static final String TOKEN = "token";
+    private static final String COLUMN_ID = "id";
 
     public DBHandler(Context context){
         super(context, DB_NAME, null, 1);
@@ -21,6 +24,7 @@ public class DBHandler extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         String query = "CREATE TABLE " + TABLE_NAME + " ("
+                + COLUMN_ID + " INT,"
                 + REFRESH_TOKEN + " TEXT,"
                 + TOKEN + " TEXT)";
         sqLiteDatabase.execSQL(query);
@@ -30,6 +34,7 @@ public class DBHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
 
+        values.put(COLUMN_ID, 1);
         values.put(REFRESH_TOKEN, refreshToken);
         values.put(TOKEN, token);
 
@@ -59,12 +64,14 @@ public class DBHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
 
+        values.put(COLUMN_ID, 1);
         values.put(REFRESH_TOKEN, refreshToken);
         values.put(TOKEN, token);
 
-        db.update(TABLE_NAME, values, "refreshToken=?", new String[]{refreshToken});
+        db.update(TABLE_NAME, values, "id=?", new String[]{"1"});
         db.close();
     }
+
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {

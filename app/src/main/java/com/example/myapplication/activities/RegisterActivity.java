@@ -1,5 +1,6 @@
 package com.example.myapplication.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -13,7 +14,12 @@ import com.example.myapplication.R;
 import com.example.myapplication.api.ApiLogin;
 import com.example.myapplication.database.DBHandler;
 import com.example.myapplication.model.Driver;
+import com.example.myapplication.model.ResponseTT;
 import com.example.myapplication.model.Result;
+import com.example.myapplication.utils.JWTUtils;
+import com.google.gson.Gson;
+
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 
@@ -24,7 +30,7 @@ import retrofit2.Response;
 public class RegisterActivity extends AppCompatActivity {
     private EditText phoneNumber, password, name, dob, role, email, vehiclePlate;
     private RadioGroup type;
-    private Button btn;
+    private Button btn, btnBack;
     private static final int TYPE_DRIVER = 1;
     private DBHandler dbHandler = new DBHandler(RegisterActivity.this);
 
@@ -43,12 +49,21 @@ public class RegisterActivity extends AppCompatActivity {
         email = findViewById(R.id.email);
         type = findViewById(R.id.rdoPlate);
         vehiclePlate = findViewById(R.id.vehiclePlate);
-
+        btnBack = findViewById(R.id.registerFinalBackBtn);
         btn = findViewById(R.id.registerFinalRegisterBtn);
+
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 onRegister();
+            }
+        });
+
+        btnBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+                startActivity(intent);
             }
         });
     }
@@ -68,30 +83,52 @@ public class RegisterActivity extends AppCompatActivity {
                 name.getText().toString(), dob.getText().toString(),TYPE_DRIVER,
                 email.getText().toString(), type_vehicle, vehiclePlate.getText().toString());
 
-        ApiLogin.apiService.registerDriver(driver).enqueue(new Callback<Result>() {
+        ApiLogin.apiService.registerDriver(driver).enqueue(new Callback<ResponseTT>() {
             @Override
-            public void onResponse(Call<Result> call, Response<Result> response) {
-                if(response.body() != null && !response.body().getLoginError().equals("INVALID_PARAM")){
-                    ArrayList<String> s  = dbHandler.readDB();
-                    if(s.size()==0){
-                        dbHandler.addNewToken(response.body().getRefreshToken(), response.body().getToken());
-                    }else{
-                        dbHandler.update(response.body().getRefreshToken(), response.body().getToken());
+            public void onResponse(Call<ResponseTT> call, Response<ResponseTT> response) {
+                if(response.isSuccessful()){
+                    try {
+                        String isValid = response.body().getResult().getLoginError();
+                        String refreshToken = response.body().getResult().getRefreshToken();
+                        String token = response.body().getResult().getToken();
+                        Driver driver = JWTUtils.parseTokenToGetDriver(token);
+                        if(isValid.equals("SUCCESS")){
+                            writeDB(refreshToken, token, isValid);
+                            Toast.makeText(RegisterActivity.this, "Register successfully!", Toast.LENGTH_SHORT).show();
+                            moveToMainPage(driver);
+                        }else{
+                            Toast.makeText(RegisterActivity.this, "Register failure!", Toast.LENGTH_SHORT).show();
+                        }
+
+                    }catch (Exception e){
+
                     }
-                    Toast.makeText(RegisterActivity.this, "Register successfully!", Toast.LENGTH_SHORT).show();
-                }else{
-                    Toast.makeText(RegisterActivity.this, "Register failure!", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
-            public void onFailure(Call<Result> call, Throwable t) {
+            public void onFailure(Call<ResponseTT> call, Throwable t) {
+                System.out.println(t.toString());
                 Toast.makeText(RegisterActivity.this, "Register failure!", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    private void loginWithToken(){
+    public void writeDB(String refreshToken, String token, String isValid){
+        Result result = new Result(refreshToken, token, isValid);
+        ArrayList<String> s  = dbHandler.readDB();
+        if(s.size()==0){
+            dbHandler.addNewToken(refreshToken, token);
+        }else{
+            dbHandler.update(refreshToken, token);
+        }
+    }
 
+    private void moveToMainPage(Driver driver){
+        Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("object_driver", driver);
+        intent.putExtras(bundle);
+        startActivity(intent);
     }
 }

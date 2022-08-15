@@ -2,7 +2,9 @@ package com.example.myapplication.model;
 
 import android.text.Editable;
 
-public class Driver {
+import java.io.Serializable;
+
+public class Driver implements Serializable {
     private String userId;
     private String password;
     private String name;
@@ -21,6 +23,20 @@ public class Driver {
         this.email = email;
         this.type = type;
         this.vehicle_plate = vehicle_plate;
+    }
+
+    public Driver(String userId, String name, String dob, String email, int type, String vehicle_plate) {
+        this.userId = userId;
+        this.name = name;
+        this.dob = dob;
+        this.email = email;
+        this.type = type;
+        this.vehicle_plate = vehicle_plate;
+    }
+
+    public Driver(String userId, String password){
+        this.userId = userId;
+        this.password = password;
     }
 
     public Driver(){

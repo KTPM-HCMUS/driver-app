@@ -21,8 +21,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0" />
 
-    <LinearLayout
-        android:id="@+id/linearLayout"
+    <ScrollView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
@@ -32,106 +31,119 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.205">
-
-        <EditText
-            android:id="@+id/phoneNumber"
-            android:layout_width="306dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
-            android:background="#FFFFFF"
-            android:ems="10"
-            android:hint="Phone Number"
-            android:inputType="textEmailAddress"
-            android:padding="10dp" />
-
-
-        <EditText
-            android:id="@+id/password"
-            android:layout_width="306dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20sp"
-            android:background="#FFFFFF"
-            android:ems="10"
-            android:hint="Password"
-            android:inputType="textPassword"
-            android:padding="10dp" />
-
-        <EditText
-            android:id="@+id/name"
-            android:layout_width="306dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20sp"
-            android:background="#FFFFFF"
-            android:ems="10"
-            android:hint="Name"
-            android:padding="10dp" />
-
-        <EditText
-            android:id="@+id/dob"
-            android:layout_width="306dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20sp"
-            android:background="#FFFFFF"
-            android:ems="10"
-            android:hint="Date Of Birth"
-            android:padding="10dp" />
-
-        <EditText
-            android:id="@+id/email"
-            android:layout_width="306dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20sp"
-            android:background="#FFFFFF"
-            android:ems="10"
-            android:hint="Email"
-            android:padding="10dp" />
-
-        <EditText
-            android:id="@+id/vehiclePlate"
-            android:layout_width="306dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20sp"
-            android:background="#FFFFFF"
-            android:ems="10"
-            android:hint="Vehicle Plate"
-            android:padding="10dp" />
-
-        <TextView
-            android:layout_width="306dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20sp"
-            android:textSize="16dp"
-            android:text="Vehicle plate"/>
-        <RadioGroup
-            android:layout_width="306dp"
-            android:id="@+id/rdoPlate"
-            android:layout_height="wrap_content">
-            <RadioButton
-                android:id="@+id/rdoMotorbike"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Motorbike"/>
-            <RadioButton
-                android:id="@+id/rdoCar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Car"/>
-        </RadioGroup>
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"/>
-
-        <Button
-            android:id="@+id/registerFinalRegisterBtn"
+            android:id="@+id/linearLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@android:color/transparent"
-            android:backgroundTint="#2AC7FE"
-            android:padding="10dp"
-            android:text="Register"
-            android:textColor="#3CCCFE"
-            android:textSize="18sp" />
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.205">
 
-    </LinearLayout>
+            <EditText
+                android:id="@+id/phoneNumber"
+                android:layout_width="306dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="40dp"
+                android:background="#FFFFFF"
+                android:ems="10"
+                android:hint="Phone Number"
+                android:inputType="textEmailAddress"
+                android:padding="10dp" />
+
+
+            <EditText
+                android:id="@+id/password"
+                android:layout_width="306dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20sp"
+                android:background="#FFFFFF"
+                android:ems="10"
+                android:hint="Password"
+                android:inputType="textPassword"
+                android:padding="10dp" />
+
+            <EditText
+                android:id="@+id/name"
+                android:layout_width="306dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20sp"
+                android:background="#FFFFFF"
+                android:ems="10"
+                android:hint="Name"
+                android:padding="10dp" />
+
+            <EditText
+                android:id="@+id/dob"
+                android:layout_width="306dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20sp"
+                android:background="#FFFFFF"
+                android:ems="10"
+                android:hint="Date Of Birth"
+                android:padding="10dp" />
+
+            <EditText
+                android:id="@+id/email"
+                android:layout_width="306dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20sp"
+                android:background="#FFFFFF"
+                android:ems="10"
+                android:hint="Email"
+                android:padding="10dp" />
+
+            <EditText
+                android:id="@+id/vehiclePlate"
+                android:layout_width="306dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20sp"
+                android:background="#FFFFFF"
+                android:ems="10"
+                android:hint="Vehicle Plate"
+                android:padding="10dp" />
+
+            <TextView
+                android:layout_width="306dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20sp"
+                android:textSize="16dp"
+                android:text="Vehicle plate"/>
+            <RadioGroup
+                android:layout_width="306dp"
+                android:id="@+id/rdoPlate"
+                android:layout_height="wrap_content">
+                <RadioButton
+                    android:id="@+id/rdoMotorbike"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Motorbike"/>
+                <RadioButton
+                    android:id="@+id/rdoCar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Car"/>
+            </RadioGroup>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"/>
+
+            <Button
+                android:id="@+id/registerFinalRegisterBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/blue"
+                android:backgroundTint="#2AC7FE"
+                android:padding="10dp"
+                android:text="Register"
+                android:textColor="#3CCCFE"
+                android:textSize="18sp" />
+
+        </LinearLayout>
+    </ScrollView>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

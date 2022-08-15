@@ -5,15 +5,12 @@ public class Result {
     private String refreshToken;
     private String loginError;
 
-    public Result(String token, String refreshToken, String loginError) {
+    public Result(String refreshToken, String token, String loginError) {
         this.token = token;
         this.refreshToken = refreshToken;
         this.loginError = loginError;
     }
-
-    public Result(){
-
-    }
+    public Result(){}
 
     public String getToken() {
         return token;
