@@ -2,6 +2,7 @@ package com.example.myapplication.api;
 
 import com.example.myapplication.model.Driver;
 import com.example.myapplication.model.DriverTemp;
+import com.example.myapplication.model.LoginModel;
 import com.example.myapplication.model.ResponseTT;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -32,7 +33,7 @@ public interface ApiLogin {
     Call<ResponseTT> registerDriver(@Body Driver driver);
 
     @POST("login")
-    Call<ResponseTT> loginDriver(@Body Driver driver);
+    Call<ResponseTT> loginDriver(@Body LoginModel loginModel);
 
     @POST("refreshToken")
     Call<ResponseTT> getNewToken(@Body DriverTemp driverTemp);

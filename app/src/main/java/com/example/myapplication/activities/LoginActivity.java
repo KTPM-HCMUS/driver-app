@@ -1,6 +1,5 @@
 package com.example.myapplication.activities;
 
-import android.Manifest;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -16,13 +15,10 @@ import com.example.myapplication.api.ApiLogin;
 import com.example.myapplication.database.DBHandler;
 import com.example.myapplication.model.Driver;
 import com.example.myapplication.model.DriverTemp;
+import com.example.myapplication.model.LoginModel;
 import com.example.myapplication.model.ResponseTT;
 import com.example.myapplication.model.Result;
 import com.example.myapplication.utils.JWTUtils;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 
@@ -63,7 +59,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void LoginWithUserIdAndPassword(){
-        Driver driver = new Driver(phoneNumber.getText().toString(), password.getText().toString());
+        LoginModel driver = new LoginModel(phoneNumber.getText().toString(), password.getText().toString());
         ApiLogin.apiService.loginDriver(driver).enqueue(new Callback<ResponseTT>() {
             @Override
             public void onResponse(Call<ResponseTT> call, Response<ResponseTT> response) {
@@ -127,26 +123,39 @@ public class LoginActivity extends AppCompatActivity {
 
 
     private void success(Response<ResponseTT> response){
-        Driver driver = JWTUtils.parseTokenToGetDriver(handler.readDB().get(1));
-            try {
-                String isValid = response.body().getResult().getLoginError();
-                String refreshToken = response.body().getResult().getRefreshToken();
-                String token = response.body().getResult().getToken();
-                if(isValid.equals("SUCCESS")){
-                    handler.update(refreshToken, token);
-                    moveToMainPage(driver);
-                }else{
+        ArrayList<String> s = handler.readDB();
+        Driver driver = JWTUtils.parseTokenToGetDriver(response.body().getResult().getToken());
+        try {
+            String isValid = response.body().getResult().getLoginError();
+            String refreshToken = response.body().getResult().getRefreshToken();
+            String token = response.body().getResult().getToken();
+            if(isValid.equals("SUCCESS")){
+                writeDB(refreshToken, token, isValid);
+                moveToMainPage(driver);
+            }else{
+                if(s.size() != 0){
                     getRefreshToken(driver.getUserId());
-                    Toast.makeText(LoginActivity.this, "Login failure!", Toast.LENGTH_SHORT).show();
                 }
-            }catch (Exception e){
-                getRefreshToken(driver.getUserId());
+                Toast.makeText(LoginActivity.this, "Username or password is wrong", Toast.LENGTH_SHORT).show();
             }
+        }catch (Exception e){
+            getRefreshToken(driver.getUserId());
+        }
 
     }
 
     private void failure(){
         Toast.makeText(LoginActivity.this, "Login failure!", Toast.LENGTH_SHORT).show();
+    }
+
+    public void writeDB(String refreshToken, String token, String isValid){
+        Result result = new Result(refreshToken, token, isValid);
+        ArrayList<String> s  = handler.readDB();
+        if(s.size()==0){
+            handler.addNewToken(refreshToken, token);
+        }else{
+            handler.update(refreshToken, token);
+        }
     }
 
 

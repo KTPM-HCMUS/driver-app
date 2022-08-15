@@ -28,7 +28,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class RegisterActivity extends AppCompatActivity {
-    private EditText phoneNumber, password, name, dob, role, email, vehiclePlate;
+    private EditText phoneNumber, password, name, dob, email, vehiclePlate;
     private RadioGroup type;
     private Button btn, btnBack;
     private static final int TYPE_DRIVER = 1;
@@ -79,43 +79,63 @@ public class RegisterActivity extends AppCompatActivity {
                 type_vehicle = 2;
             }
         }
-        Driver driver = new Driver(phoneNumber.getText().toString(), password.getText().toString(),
-                name.getText().toString(), dob.getText().toString(),TYPE_DRIVER,
-                email.getText().toString(), type_vehicle, vehiclePlate.getText().toString());
 
-        ApiLogin.apiService.registerDriver(driver).enqueue(new Callback<ResponseTT>() {
-            @Override
-            public void onResponse(Call<ResponseTT> call, Response<ResponseTT> response) {
-                if(response.isSuccessful()){
-                    try {
-                        String isValid = response.body().getResult().getLoginError();
-                        String refreshToken = response.body().getResult().getRefreshToken();
-                        String token = response.body().getResult().getToken();
-                        Driver driver = JWTUtils.parseTokenToGetDriver(token);
-                        if(isValid.equals("SUCCESS")){
-                            writeDB(refreshToken, token, isValid);
-                            Toast.makeText(RegisterActivity.this, "Register successfully!", Toast.LENGTH_SHORT).show();
-                            moveToMainPage(driver);
-                        }else{
+        String phoneNumberValue = phoneNumber.getText().toString();
+        String passwordValue = password.getText().toString();
+        String nameValue = name.getText().toString();
+        String dobValue = dob.getText().toString();
+        String emailValue = email.getText().toString();
+        String vehiclePlateValue = vehiclePlate.getText().toString();
+
+        if(!checkRegisterForm(phoneNumberValue, passwordValue, nameValue, dobValue, emailValue, vehiclePlateValue)){
+            Toast.makeText(RegisterActivity.this, "You must fulfill all fields in register form!", Toast.LENGTH_SHORT).show();
+        }else{
+            Driver driver = new Driver(phoneNumberValue, passwordValue,
+                    nameValue, dobValue,TYPE_DRIVER,
+                    emailValue, type_vehicle, vehiclePlateValue);
+
+            ApiLogin.apiService.registerDriver(driver).enqueue(new Callback<ResponseTT>() {
+                @Override
+                public void onResponse(Call<ResponseTT> call, Response<ResponseTT> response) {
+                    if(response.isSuccessful()){
+                        try {
+                            String isValid = response.body().getResult().getLoginError();
+                            String refreshToken = response.body().getResult().getRefreshToken();
+                            String token = response.body().getResult().getToken();
+                            Driver driver = JWTUtils.parseTokenToGetDriver(token);
+                            if(isValid.equals("SUCCESS")){
+                                writeDB(refreshToken, token, isValid);
+                                Toast.makeText(RegisterActivity.this, "Register successfully!", Toast.LENGTH_SHORT).show();
+                                moveToMainPage(driver);
+                            }else{
+                                Toast.makeText(RegisterActivity.this, "Register failure!", Toast.LENGTH_SHORT).show();
+                            }
+
+                        }catch (Exception e){
                             Toast.makeText(RegisterActivity.this, "Register failure!", Toast.LENGTH_SHORT).show();
+                            e.printStackTrace();
                         }
-
-                    }catch (Exception e){
-
                     }
                 }
-            }
 
-            @Override
-            public void onFailure(Call<ResponseTT> call, Throwable t) {
-                System.out.println(t.toString());
-                Toast.makeText(RegisterActivity.this, "Register failure!", Toast.LENGTH_SHORT).show();
-            }
-        });
+                @Override
+                public void onFailure(Call<ResponseTT> call, Throwable t) {
+                    System.out.println(t.toString());
+                    Toast.makeText(RegisterActivity.this, "Register failure!", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+    }
+
+    private boolean checkRegisterForm(String phoneNumberValue, String passwordValue, String nameValue, String dobValue, String emailValue, String vehiclePlateValue) {
+        if(!phoneNumberValue.equals("") && !passwordValue.equals("") && !nameValue.equals("") &&
+            !dobValue.equals("") && !emailValue.equals("") && !vehiclePlateValue.equals("")){
+            return true;
+        }
+        return false;
     }
 
     public void writeDB(String refreshToken, String token, String isValid){
-        Result result = new Result(refreshToken, token, isValid);
         ArrayList<String> s  = dbHandler.readDB();
         if(s.size()==0){
             dbHandler.addNewToken(refreshToken, token);
@@ -131,4 +151,6 @@ public class RegisterActivity extends AppCompatActivity {
         intent.putExtras(bundle);
         startActivity(intent);
     }
+
+
 }
