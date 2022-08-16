@@ -24,5 +24,5 @@ public interface ApiService {
             .create(ApiService.class);
 
     @POST("api/v1/location")
-    Call<LocationDriver> updateLocationDriver(@Body LocationDriver locationDriver);
+    Call<Void> updateLocationDriver(@Body LocationDriver locationDriver);
 }

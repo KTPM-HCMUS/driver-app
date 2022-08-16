@@ -11,14 +11,14 @@ public class LocationDriver {
         this.longitude = longitude;
     }
     public LocationDriver(){}
-
-    public int getdriverID() {
-        return driverID;
-    }
-
-    public void setdriverID(int driverID) {
-        this.driverID = driverID;
-    }
+//
+//    public String getDriverID() {
+//        return driverID;
+//    }
+//
+//    public void setDriverID(String driverID) {
+//        this.driverID = driverID;
+//    }
 
     public double getLatitude() {
         return latitude;

@@ -3,6 +3,7 @@ package com.example.myapplication.utils;
 import android.app.job.JobParameters;
 import android.app.job.JobService;
 import android.os.PersistableBundle;
+import android.util.Log;
 
 import com.example.myapplication.api.ApiService;
 import com.example.myapplication.model.LocationDriver;
@@ -27,20 +28,28 @@ public class MyJobService extends JobService {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                Double longtitude = jobParameters.getExtras().getDouble("lon");
-                Double latitude = jobParameters.getExtras().getDouble("lat");
-                LocationDriver locationDriver = new LocationDriver(1, latitude, longtitude);
-                ApiService.apiService.updateLocationDriver(locationDriver).enqueue(new Callback<LocationDriver>() {
-                    @Override
-                    public void onResponse(Call<LocationDriver> call, Response<LocationDriver> response) {
-                        System.out.println("LOG TRUE" + response.body());
-                    }
+                while (!jobCancelled){
+                    try {
+                        Thread.sleep(60000);
+                        Double longitude = jobParameters.getExtras().getDouble("lon");
+                        Double latitude = jobParameters.getExtras().getDouble("lat");
+//                String userId = jobParameters.getExtras().getString("userId");
+                        LocationDriver locationDriver = new LocationDriver(1, latitude, longitude);
+                        ApiService.apiService.updateLocationDriver(locationDriver).enqueue(new Callback<Void>() {
+                            @Override
+                            public void onResponse(Call<Void> call, Response<Void> response) {
+                                System.out.println("zh");
+                            }
 
-                    @Override
-                    public void onFailure(Call<LocationDriver> call, Throwable t) {
-                        System.out.println("LOG FAIL");
+                            @Override
+                            public void onFailure(Call<Void> call, Throwable t) {
+                                System.out.println("zh");
+                            }
+                        });
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
                     }
-                });
+                }
                 jobFinished(jobParameters, false);
             }
         }).start();
@@ -53,11 +62,4 @@ public class MyJobService extends JobService {
         return true;
     }
 
-    private LocationDriver getLocationData(JobParameters parameters){
-        PersistableBundle bundle = new PersistableBundle();
-        String a = bundle.getString("data");
-        String json = parameters.getExtras().getString("data");
-        Gson g = new Gson();
-        return g.fromJson(json, LocationDriver.class);
-    }
 }

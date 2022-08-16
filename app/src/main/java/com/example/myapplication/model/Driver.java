@@ -34,10 +34,6 @@ public class Driver implements Serializable {
         this.vehicle_plate = vehicle_plate;
     }
 
-    public Driver(String userId, String password){
-        this.userId = userId;
-        this.password = password;
-    }
 
     public Driver(){
 
