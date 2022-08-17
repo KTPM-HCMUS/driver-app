@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.myapplication.R;
 import com.example.myapplication.api.ApiLogin;
+import com.example.myapplication.client.LocationStreamingClient;
 import com.example.myapplication.database.DBHandler;
 import com.example.myapplication.model.Driver;
 import com.example.myapplication.model.DriverTemp;
@@ -19,8 +20,13 @@ import com.example.myapplication.model.LoginModel;
 import com.example.myapplication.model.ResponseTT;
 import com.example.myapplication.model.Result;
 import com.example.myapplication.utils.JWTUtils;
+import com.ktpm.vehiclebooking.LocationOuterClass;
 
 import java.util.ArrayList;
+import java.util.Random;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -40,7 +46,7 @@ public class LoginActivity extends AppCompatActivity {
         password  = findViewById(R.id.loginPasswordEditText);
         btn = findViewById(R.id.loginLoginBtn);
         registerForm = findViewById(R.id.moveToRegisterTextView);
-
+        testStreaming();
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -158,5 +164,51 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
+    public void testStreaming() {
+        Thread thread = new Thread(() -> {
+            LocationStreamingClient client = new LocationStreamingClient();
+            ExecutorService sendDriverLocationExecutor = Executors.newSingleThreadExecutor();
+            ExecutorService getLocationExecutor = Executors.newSingleThreadExecutor();
+            ExecutorService sendCustomerLocationExecutor = Executors.newSingleThreadExecutor();
 
+            client.sendLocation("customer_test", () -> {
+                Random rd = new Random();
+                return LocationOuterClass.Location.newBuilder()
+                        .setLatitude(rd.nextDouble())
+                        .setLongitude(rd.nextDouble())
+                        .build();
+            }, sendCustomerLocationExecutor);
+            client.sendLocation("driver_test", () -> {
+                Random rd = new Random();
+                return LocationOuterClass.Location.newBuilder()
+                        .setLatitude(rd.nextDouble())
+                        .setLongitude(rd.nextDouble())
+                        .build();
+            }, sendDriverLocationExecutor);
+            client.getLocation("customer_test", "driver_test", response -> {
+                System.out.println("======================================");
+                System.out.println(Thread.currentThread().getName());
+                System.out.println("customer_test latitude=" + response.getCustomerLocation().getLatitude() + ", longitude=" + response.getCustomerLocation().getLongitude());
+                System.out.println("driver_test location=" + response.getDriverLocation().getLatitude() + ", longitude=" + response.getDriverLocation().getLongitude());
+                System.out.println("======================================");
+            }, getLocationExecutor);
+            CountDownLatch countDownLatch = new CountDownLatch(1);
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                sendCustomerLocationExecutor.shutdown();
+                sendDriverLocationExecutor.shutdown();
+                getLocationExecutor.shutdown();
+                countDownLatch.countDown();
+            }));
+            try {
+                countDownLatch.await();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
+
+        thread.start();
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            thread.stop();
+        }));
+    }
 }

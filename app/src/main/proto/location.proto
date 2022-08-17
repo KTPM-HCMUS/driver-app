@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+option java_multiple_files = false;
+option java_package = "com.ktpm.vehiclebooking";
+
+message Location {
+  double latitude = 1;
+  double longitude = 2;
+}
+
+message GetLocationRequest {
+  string driver_id = 1;
+  string customer_id = 2;
+}
+
+message GetLocationResponse {
+  string driver_id = 1;
+  string customer_id = 2;
+  Location driver_location = 3;
+  Location customer_location = 4;
+}
+
+message SendLocationRequest {
+  string user_id = 1;
+  Location location = 2;
+}
+
+message SendLocationResponse {
+  string user_id = 1;
+  bool status = 2;
+}
+
+service LocationStreaming {
+  rpc SendLocation (stream SendLocationRequest) returns (stream SendLocationResponse) {}
+  rpc GetLocation (stream GetLocationRequest) returns (stream GetLocationResponse) {}
+}
