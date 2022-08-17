@@ -124,7 +124,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private void success(Response<ResponseTT> response){
         ArrayList<String> s = handler.readDB();
-        Driver driver = JWTUtils.parseTokenToGetDriver(response.body().getResult().getToken());
+        Driver driver = JWTUtils.parseTokenToGetDriver(s.get(1));
         try {
             String isValid = response.body().getResult().getLoginError();
             String refreshToken = response.body().getResult().getRefreshToken();

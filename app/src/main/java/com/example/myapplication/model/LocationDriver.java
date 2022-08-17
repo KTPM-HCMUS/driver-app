@@ -1,24 +1,26 @@
 package com.example.myapplication.model;
 
 public class LocationDriver {
-    private int driverID;
+    private String driverID;
     private double latitude;
     private double longitude;
+    private int typeOfVehicle;
 
-    public LocationDriver(int driverID, double latitude, double longitude) {
+    public LocationDriver(String driverID, int typeOfVehicle, double latitude, double longitude) {
         this.driverID = driverID;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.typeOfVehicle = typeOfVehicle;
     }
     public LocationDriver(){}
-//
-//    public String getDriverID() {
-//        return driverID;
-//    }
-//
-//    public void setDriverID(String driverID) {
-//        this.driverID = driverID;
-//    }
+
+    public String getDriverID() {
+        return driverID;
+    }
+
+    public void setDriverID(String driverID) {
+        this.driverID = driverID;
+    }
 
     public double getLatitude() {
         return latitude;

@@ -6,6 +6,7 @@ import android.Manifest;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
 import android.content.ComponentName;
+import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -17,7 +18,9 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
+import android.os.Looper;
 import android.os.PersistableBundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,25 +28,35 @@ import android.widget.FrameLayout;
 
 import com.example.myapplication.R;
 import com.example.myapplication.activities.MainActivity;
+import com.example.myapplication.api.ApiService;
 import com.example.myapplication.model.Driver;
 import com.example.myapplication.model.LocationDriver;
 import com.example.myapplication.utils.MyJobService;
+import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResponse;
+import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.gson.Gson;
 
-public class FragmentHome extends Fragment implements OnMapReadyCallback{
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
-    private static final int JOB_ID = 123;
-    private SwitchCompat switchCompat;
-    private Driver driver;
+public class FragmentHome extends Fragment implements OnMapReadyCallback {
     private View mView;
     GoogleMap mMap;
     SupportMapFragment mapFragment;
@@ -55,25 +68,12 @@ public class FragmentHome extends Fragment implements OnMapReadyCallback{
                              Bundle savedInstanceState) {
         mView = inflater.inflate(R.layout.fragment_home, container, false);
 
-        mapFragment = (SupportMapFragment)getChildFragmentManager().findFragmentById(R.id.map);
-
+        mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
-
-        switchCompat = mView.findViewById(R.id.btnWorking);
-        switchCompat.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(switchCompat.isChecked()){
-                    onClickStartWorking();
-                }else{
-                    onClickEndWorking();
-                }
-            }
-        });
         getCurrentLocation();
-//        getDriver();
         return mView;
     }
+
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         mMap = googleMap;
@@ -115,28 +115,5 @@ public class FragmentHome extends Fragment implements OnMapReadyCallback{
     }
 
 
-    private void onClickStartWorking(){
-        PersistableBundle bundle = new PersistableBundle();
-        bundle.putDouble("lat", currentLocation.getLatitude());
-        bundle.putDouble("lon", currentLocation.getLongitude());
-//        bundle.putString("userId", driver.getUserId());
-        ComponentName componentName = new ComponentName(getActivity(), MyJobService.class);
-        JobInfo jobInfo = new JobInfo.Builder(JOB_ID, componentName)
-                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED)
-                .setExtras(bundle)
-                .setMinimumLatency(500)
-                .build();
 
-        JobScheduler jobScheduler = (JobScheduler) getActivity().getSystemService(JOB_SCHEDULER_SERVICE);
-        jobScheduler.schedule(jobInfo);
-    }
-
-    private void onClickEndWorking(){
-        JobScheduler jobScheduler = (JobScheduler) getActivity().getSystemService(JOB_SCHEDULER_SERVICE);
-        jobScheduler.cancel(JOB_ID);
-    }
-
-    private void getDriver(){
-        driver = (Driver) getArguments().get("object_driver");
-    }
 }

@@ -28,28 +28,22 @@ public class MyJobService extends JobService {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                while (!jobCancelled){
-                    try {
-                        Thread.sleep(60000);
-                        Double longitude = jobParameters.getExtras().getDouble("lon");
-                        Double latitude = jobParameters.getExtras().getDouble("lat");
+                Double longitude = jobParameters.getExtras().getDouble("lon");
+                Double latitude = jobParameters.getExtras().getDouble("lat");
 //                String userId = jobParameters.getExtras().getString("userId");
-                        LocationDriver locationDriver = new LocationDriver(1, latitude, longitude);
-                        ApiService.apiService.updateLocationDriver(locationDriver).enqueue(new Callback<Void>() {
-                            @Override
-                            public void onResponse(Call<Void> call, Response<Void> response) {
-                                System.out.println("zh");
-                            }
-
-                            @Override
-                            public void onFailure(Call<Void> call, Throwable t) {
-                                System.out.println("zh");
-                            }
-                        });
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+//                int typeOfVehicle = jobParameters.getExtras().getInt("type");
+                LocationDriver locationDriver = new LocationDriver("1",1, latitude, longitude);
+                ApiService.apiService.updateLocationDriver(locationDriver).enqueue(new Callback<Void>() {
+                    @Override
+                    public void onResponse(Call<Void> call, Response<Void> response) {
+                        System.out.println("zh");
                     }
-                }
+
+                    @Override
+                    public void onFailure(Call<Void> call, Throwable t) {
+                        System.out.println("zh");
+                    }
+                });
                 jobFinished(jobParameters, false);
             }
         }).start();

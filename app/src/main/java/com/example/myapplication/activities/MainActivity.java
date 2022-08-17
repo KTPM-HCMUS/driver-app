@@ -1,8 +1,10 @@
 package com.example.myapplication.activities;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -13,19 +15,33 @@ import android.Manifest;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
 import android.content.ComponentName;
+import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Looper;
 import android.os.PersistableBundle;
+import android.util.Log;
+import android.view.Gravity;
+import android.view.MenuItem;
 import android.view.View;
 
 import com.example.myapplication.R;
+import com.example.myapplication.api.ApiService;
 import com.example.myapplication.fragment.FragmentHome;
+import com.example.myapplication.fragment.FragmentProfile;
 import com.example.myapplication.model.Driver;
 import com.example.myapplication.model.LocationDriver;
 import com.example.myapplication.utils.MyJobService;
+import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResponse;
+import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -33,164 +49,175 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.material.navigation.NavigationView;
 import com.google.gson.Gson;
 
-//public class MainActivity extends FragmentActivity implements OnMapReadyCallback {
-//
-//    private static final int JOB_ID = 123;
-//    private SwitchCompat switchCompat;
-//    GoogleMap mMap;
-//    SupportMapFragment mapFragment;
-//    FusedLocationProviderClient fusedLocationProviderClient;
-//    LocationDriver currentLocation = new LocationDriver();
-//
-//    @Override
-//    protected void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_main);
-//
-//        final DrawerLayout drawerLayout = findViewById(R.id.drawer_layout);
-//        findViewById(R.id.imageMenu).setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                drawerLayout.openDrawer(GravityCompat.START);
-//            }
-//        });
-//        mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-//
-//        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-//
-//        if(ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)==PackageManager.PERMISSION_GRANTED){
-//            getCurrentLocation();
-//        }else{
-//            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 44);
-//        }
-//
-//        switchCompat = findViewById(R.id.btnWorking);
-//        switchCompat.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                if(switchCompat.isChecked()){
-//                    onClickStartWorking();
-//                }else{
-//                    onClickEndWorking();
-//                }
-//            }
-//        });
-//    }
-//
-//    @Override
-//    public void onMapReady(@NonNull GoogleMap googleMap) {
-//        mMap = googleMap;
-//
-//        mMap.getUiSettings().setMyLocationButtonEnabled(true);
-//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//            // TODO: Consider calling
-//            //    ActivityCompat#requestPermissions
-//            // here to request the missing permissions, and then overriding
-//            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-//            //                                          int[] grantResults)
-//            // to handle the case where the user grants the permission. See the documentation
-//            // for ActivityCompat#requestPermissions for more details.
-//            return;
-//        }
-//        LatLng current = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
-//        mMap.addMarker(new MarkerOptions().position(current));
-////        mMap.setMyLocationEnabled(true);
-////        mMap.getUiSettings().setZoomControlsEnabled(true);
-//    }
-//
-//    private void getCurrentLocation() {
-//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//            // TODO: Consider calling
-//            //    ActivityCompat#requestPermissions
-//            // here to request the missing permissions, and then overriding
-//            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-//            //                                          int[] grantResults)
-//            // to handle the case where the user grants the permission. See the documentation
-//            // for ActivityCompat#requestPermissions for more details.
-//            return;
-//        }
-//        fusedLocationProviderClient.getLastLocation()
-//                .addOnSuccessListener(new OnSuccessListener<Location>() {
-//            @Override
-//            public void onSuccess(Location location) {
-//                if(location != null){
-//                    mapFragment.getMapAsync(new OnMapReadyCallback() {
-//                        @Override
-//                        public void onMapReady(@NonNull GoogleMap googleMap) {
-//                            LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-//                            MarkerOptions options = new MarkerOptions().position(latLng);
-//                            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
-//                            googleMap.addMarker(options);
-//                            currentLocation.setLatitude(location.getLatitude());
-//                            currentLocation.setLongitude(location.getLongitude());
-//                        }
-//                    });
-//                }
-//            }
-//        });
-//    }
-//
-//    @Override
-//    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-//        if (requestCode == 44) {
-//            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-//                getCurrentLocation();
-//            }
-//        }
-//    }
-//
-//    private void onClickStartWorking(){
-//        PersistableBundle bundle = new PersistableBundle();
-//        bundle.putDouble("lat", currentLocation.getLatitude());
-//        bundle.putDouble("lon", currentLocation.getLongitude());
-//        ComponentName componentName = new ComponentName(this, MyJobService.class);
-//        JobInfo jobInfo = new JobInfo.Builder(JOB_ID, componentName)
-//                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED)
-//                .setPeriodic(15*60*1000)
-//                .setExtras(bundle)
-//                .build();
-//
-//        JobScheduler jobScheduler = (JobScheduler) getSystemService(JOB_SCHEDULER_SERVICE);
-//        jobScheduler.schedule(jobInfo);
-//    }
-//
-//    private void onClickEndWorking(){
-//        JobScheduler jobScheduler = (JobScheduler) getSystemService(JOB_SCHEDULER_SERVICE);
-//        jobScheduler.cancel(JOB_ID);
-//    }
-//
-//    private void setDataObject(LocationDriver locationDriver){
-//        LocationDriver locationDriver1 = new LocationDriver(1, locationDriver.getLongitude(), locationDriver.getLatitude());
-//        Gson g = new Gson();
-//        String json = g.toJson(locationDriver1);
-//
-//        PersistableBundle bundle = new PersistableBundle();
-//        bundle.putString("data", json);
-//    }
-//}
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
     private Driver driver;
+    private DrawerLayout drawerLayout;
+    private SwitchCompat switchCompat;
+    private LocationRequest locationRequest;
+    private FusedLocationProviderClient fusedLocationProviderClient;
+    private Bundle bundle;
+
+    LocationCallback locationCallback = new LocationCallback() {
+        @Override
+        public void onLocationResult(LocationResult locationResult) {
+            if (locationResult == null) return;
+            for(Location location : locationResult.getLocations()){
+                Log.d("TAG", "onLocationResult" + location.toString());
+                updateLocationDriver(location.getLongitude(), location.getLatitude(), "1", 1);
+            }
+        }
+    };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //navigation
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        drawerLayout = findViewById(R.id.drawer_layout);
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar,R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawerLayout.addDrawerListener(toggle);
+        toggle.syncState();
+
+        //set bundle
+        bundle = getBundleDriver();
+
+        //main fragment
         Fragment fragment = new FragmentHome();
 
-        if(getIntent().getExtras()!=null){
-            driver = (Driver) getIntent().getExtras().get("object_driver");
-            Bundle bundle = new Bundle();
-            bundle.putSerializable("object_driver", driver);
-            fragment.setArguments(bundle);
+        if(savedInstanceState == null){
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.frame_layout, fragment)
+                    .commit();
+            navigationView.setCheckedItem(R.id.nav_driver_home);
         }
 
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.frame_layout, fragment)
-                .commit();
+        // toggle
+        switchCompat = findViewById(R.id.btnWorking);
+        switchCompat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (switchCompat.isChecked()) {
+                    checkSettingsAndStartLocationUpdates();
+                } else {
+                    stopLocationUpdate();
+                }
+            }
+        });
+
+        // get location request
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+        locationRequest = LocationRequest.create();
+        locationRequest.setInterval(6000);
+        locationRequest.setFastestInterval(4000);
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(drawerLayout.isDrawerOpen(GravityCompat.START)){
+            drawerLayout.closeDrawer(GravityCompat.START);
+        }else{
+            super.onBackPressed();
+        }
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.nav_driver_home:
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.frame_layout, new FragmentHome())
+                        .commit();
+                break;
+            case R.id.nav_profile:
+                FragmentProfile fragmentProfile = new FragmentProfile();
+                fragmentProfile.setArguments(bundle);
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.frame_layout, fragmentProfile)
+                        .commit();
+                break;
+        }
+        drawerLayout.closeDrawer(GravityCompat.START);
+        return true;
+    }
+
+    private void checkSettingsAndStartLocationUpdates() {
+        LocationSettingsRequest request = new LocationSettingsRequest.Builder()
+                .addLocationRequest(locationRequest).build();
+
+        SettingsClient client = LocationServices.getSettingsClient(this);
+        Task<LocationSettingsResponse> locationSettingsResponseTask = client.checkLocationSettings(request);
+        locationSettingsResponseTask.addOnSuccessListener(new OnSuccessListener<LocationSettingsResponse>() {
+            @Override
+            public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
+                startLocationUpdate();
+            }
+        });
+
+        locationSettingsResponseTask.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                if (e instanceof ResolvableApiException) {
+                    ResolvableApiException apiException = (ResolvableApiException) e;
+                    try {
+                        apiException.startResolutionForResult(MainActivity.this, 1001);
+                    } catch (IntentSender.SendIntentException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            }
+        });
+    }
+
+    private void startLocationUpdate() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
+    }
+
+    private void stopLocationUpdate(){
+        fusedLocationProviderClient.removeLocationUpdates(locationCallback);
+    }
+
+    private void updateLocationDriver(Double longitude, Double latitude, String userID, int typeOfVehicle){
+        ApiService.apiService.updateLocationDriver(new LocationDriver(userID, typeOfVehicle, latitude, longitude)).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                Log.d("UPDATE LOCATION DRIVER", "successful");
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                Log.d("UPDATE LOCATION DRIVER", "failure");
+            }
+        });
+    }
+
+    private Bundle getBundleDriver(){
+        Bundle bundle = null;
+        if(getIntent().getExtras()!=null){
+            driver = (Driver) getIntent().getExtras().get("object_driver");
+            bundle = new Bundle();
+            bundle.putSerializable("object_driver", driver);
+        }
+        return bundle;
     }
 }
