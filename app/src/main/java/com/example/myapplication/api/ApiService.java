@@ -3,6 +3,7 @@ package com.example.myapplication.api;
 import android.location.LocationListener;
 
 import com.example.myapplication.model.LocationDriver;
+import com.example.myapplication.model.LocationResponse;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -18,11 +19,11 @@ public interface ApiService {
             .create();
 
     ApiService apiService = new Retrofit.Builder()
-            .baseUrl("https://driver-location.herokuapp.com/")
+            .baseUrl("https://api-location-v1.herokuapp.com/")
             .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
             .create(ApiService.class);
 
     @POST("api/v1/location")
-    Call<Void> updateLocationDriver(@Body LocationDriver locationDriver);
+    Call<LocationResponse> updateLocationDriver(@Body LocationDriver locationDriver);
 }

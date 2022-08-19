@@ -30,9 +30,10 @@ import com.example.myapplication.R;
 import com.example.myapplication.api.ApiService;
 import com.example.myapplication.fragment.FragmentHome;
 import com.example.myapplication.fragment.FragmentProfile;
+import com.example.myapplication.fragment.MyBottomSheetDialogFragment;
 import com.example.myapplication.model.Driver;
 import com.example.myapplication.model.LocationDriver;
-import com.example.myapplication.utils.MyJobService;
+import com.example.myapplication.model.LocationResponse;
 import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -64,8 +65,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private DrawerLayout drawerLayout;
     private SwitchCompat switchCompat;
     private LocationRequest locationRequest;
+    private LocationResponse locationResponse;
+    private LocationDriver locationDriver;
     private FusedLocationProviderClient fusedLocationProviderClient;
-    private Bundle bundle;
+    private Bundle bundleDriver;
 
     LocationCallback locationCallback = new LocationCallback() {
         @Override
@@ -73,7 +76,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             if (locationResult == null) return;
             for(Location location : locationResult.getLocations()){
                 Log.d("TAG", "onLocationResult" + location.toString());
-                updateLocationDriver(location.getLongitude(), location.getLatitude(), "1", 1);
+                locationDriver.setLongitude(location.getLongitude());
+                locationDriver.setLatitude(location.getLatitude());
+                updateLocationDriver(location.getLongitude(), location.getLatitude());
             }
         }
     };
@@ -81,6 +86,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        //create location driver
+        Driver driver = getDriver();
+        String token = getToken();
+        locationDriver = new LocationDriver(driver.getUserId(), driver.getType(), 0.0, 0.0, token);
 
         //navigation
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -93,7 +102,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         toggle.syncState();
 
         //set bundle
-        bundle = getBundleDriver();
+        bundleDriver = getBundleDriver();
 
         //main fragment
         Fragment fragment = new FragmentHome();
@@ -147,7 +156,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
             case R.id.nav_profile:
                 FragmentProfile fragmentProfile = new FragmentProfile();
-                fragmentProfile.setArguments(bundle);
+                fragmentProfile.setArguments(bundleDriver);
                 getSupportFragmentManager()
                         .beginTransaction()
                         .replace(R.id.frame_layout, fragmentProfile)
@@ -197,15 +206,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         fusedLocationProviderClient.removeLocationUpdates(locationCallback);
     }
 
-    private void updateLocationDriver(Double longitude, Double latitude, String userID, int typeOfVehicle){
-        ApiService.apiService.updateLocationDriver(new LocationDriver(userID, typeOfVehicle, latitude, longitude)).enqueue(new Callback<Void>() {
+    private void updateLocationDriver(Double longitude, Double latitude){
+        locationDriver.setLatitude(latitude);
+        locationDriver.setLongitude(longitude);
+        ApiService.apiService.updateLocationDriver(locationDriver).enqueue(new Callback<LocationResponse>() {
             @Override
-            public void onResponse(Call<Void> call, Response<Void> response) {
+            public void onResponse(Call<LocationResponse> call, Response<LocationResponse> response) {
                 Log.d("UPDATE LOCATION DRIVER", "successful");
+                if(response.body()!=null){
+                    locationResponse = (LocationResponse) response.body();
+//                    bundleClient = new Bundle();
+//                    bundleClient.putSerializable("object_client", locationResponse);
+                    locationDriver.setStatus("MATCHED");
+                    showBottomDialog();
+
+                }
             }
 
             @Override
-            public void onFailure(Call<Void> call, Throwable t) {
+            public void onFailure(Call<LocationResponse> call, Throwable t) {
                 Log.d("UPDATE LOCATION DRIVER", "failure");
             }
         });
@@ -214,10 +233,31 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private Bundle getBundleDriver(){
         Bundle bundle = null;
         if(getIntent().getExtras()!=null){
-            driver = (Driver) getIntent().getExtras().get("object_driver");
+            driver = (Driver) getIntent().getExtras().get("object_driver_init");
             bundle = new Bundle();
             bundle.putSerializable("object_driver", driver);
         }
         return bundle;
+    }
+
+    private Driver getDriver(){
+        if(getIntent().getExtras()!=null){
+            return (Driver) getIntent().getExtras().get("object_driver_init");
+        }
+        return null;
+    }
+
+    private String getToken(){
+        if(getIntent().getExtras()!=null){
+            return (String) getIntent().getExtras().get("token");
+        }
+        return null;
+    }
+
+    private void showBottomDialog(){
+        if(locationResponse==null) return;
+        MyBottomSheetDialogFragment myBottomSheetDialogFragment = MyBottomSheetDialogFragment.newInstance(locationResponse, locationDriver);
+        myBottomSheetDialogFragment.show(getSupportFragmentManager(), myBottomSheetDialogFragment.getTag());
+        myBottomSheetDialogFragment.setCancelable(false);
     }
 }
