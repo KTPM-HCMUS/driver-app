@@ -7,12 +7,21 @@ public class LocationResponse implements Serializable {
     private String name;
     private LocationClient locationClient;
     private Double price;
+    private String id;
 
-    public LocationResponse(String phoneNumber, String name, LocationClient locationClient, Double price) {
+    public LocationResponse(String phoneNumber, String name, LocationClient locationClient, Double price, String id) {
         this.phoneNumber = phoneNumber;
         this.name = name;
         this.locationClient = locationClient;
         this.price = price;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getPhoneNumber() {

@@ -34,6 +34,7 @@ import com.example.myapplication.fragment.MyBottomSheetDialogFragment;
 import com.example.myapplication.model.Driver;
 import com.example.myapplication.model.LocationDriver;
 import com.example.myapplication.model.LocationResponse;
+import com.example.myapplication.utils.StreamingLocationUtils;
 import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -56,6 +57,9 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
 import com.google.gson.Gson;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -66,9 +70,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private SwitchCompat switchCompat;
     private LocationRequest locationRequest;
     private LocationResponse locationResponse;
-    private LocationDriver locationDriver;
+    private static LocationDriver locationDriver;
     private FusedLocationProviderClient fusedLocationProviderClient;
     private Bundle bundleDriver;
+    ExecutorService sendDriverLocationExecutor = Executors.newSingleThreadExecutor();
+    ExecutorService sendClientLocationExecutor = Executors.newSingleThreadExecutor();
+    ExecutorService getLocationExcutor = Executors.newSingleThreadExecutor();
+
+
 
     LocationCallback locationCallback = new LocationCallback() {
         @Override
@@ -78,10 +87,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 Log.d("TAG", "onLocationResult" + location.toString());
                 locationDriver.setLongitude(location.getLongitude());
                 locationDriver.setLatitude(location.getLatitude());
-                updateLocationDriver(location.getLongitude(), location.getLatitude());
+                updateLocationDriver();
+                FragmentHome.updateLocationMarker(driver.getRole(), new LatLng(location.getLatitude(), location.getLongitude()), locationDriver.getTypeOfVehicle());
             }
         }
     };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -106,7 +117,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         //main fragment
         Fragment fragment = new FragmentHome();
-
+        fragment.setArguments(bundleDriver);
         if(savedInstanceState == null){
             getSupportFragmentManager()
                     .beginTransaction()
@@ -131,8 +142,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // get location request
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         locationRequest = LocationRequest.create();
-        locationRequest.setInterval(6000);
-        locationRequest.setFastestInterval(4000);
+        locationRequest.setInterval(500);
+        locationRequest.setFastestInterval(500);
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
@@ -206,20 +217,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         fusedLocationProviderClient.removeLocationUpdates(locationCallback);
     }
 
-    private void updateLocationDriver(Double longitude, Double latitude){
-        locationDriver.setLatitude(latitude);
-        locationDriver.setLongitude(longitude);
+
+    private void updateLocationDriver(){
         ApiService.apiService.updateLocationDriver(locationDriver).enqueue(new Callback<LocationResponse>() {
             @Override
             public void onResponse(Call<LocationResponse> call, Response<LocationResponse> response) {
                 Log.d("UPDATE LOCATION DRIVER", "successful");
                 if(response.body()!=null){
                     locationResponse = (LocationResponse) response.body();
-//                    bundleClient = new Bundle();
-//                    bundleClient.putSerializable("object_client", locationResponse);
                     locationDriver.setStatus("MATCHED");
+                    StreamingLocationUtils.sendLocation(sendDriverLocationExecutor, locationDriver.getDriverID());
+                    StreamingLocationUtils.sendLocationClient(sendClientLocationExecutor, "0868944407", new LatLng(10.762764014796876,106.68237984134088));
+                    StreamingLocationUtils.getLocationID("0868944407", locationDriver.getDriverID(), locationDriver.getTypeOfVehicle(),
+                            getLocationExcutor, new LatLng(locationResponse.getLocationClient().getLatitudeDestination(), locationResponse.getLocationClient().getLongitudeDestination()),MainActivity.this);
                     showBottomDialog();
-
                 }
             }
 
@@ -259,5 +270,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         MyBottomSheetDialogFragment myBottomSheetDialogFragment = MyBottomSheetDialogFragment.newInstance(locationResponse, locationDriver);
         myBottomSheetDialogFragment.show(getSupportFragmentManager(), myBottomSheetDialogFragment.getTag());
         myBottomSheetDialogFragment.setCancelable(false);
+    }
+
+    public static LatLng getDriverForStream(){
+        return new LatLng(locationDriver.getLatitude(), locationDriver.getLongitude());
     }
 }

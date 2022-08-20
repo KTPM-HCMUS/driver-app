@@ -17,7 +17,7 @@ public class LocationDriver implements Serializable {
         this.longitude = longitude;
         this.typeOfVehicle = typeOfVehicle;
         this.token = token;
-        this.status = "NOT_MATCHED";
+        this.status = "NOT_MATCH";
     }
     public LocationDriver(Double latitude, Double longitude){
         this.latitude = latitude;

@@ -2,6 +2,7 @@ package com.example.myapplication.fragment;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.location.Location;
 import android.os.Bundle;
 
@@ -14,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.myapplication.R;
+import com.example.myapplication.model.Driver;
 import com.example.myapplication.model.LocationDriver;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -21,7 +23,9 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 
@@ -30,18 +34,18 @@ public class FragmentHome extends Fragment implements OnMapReadyCallback {
     public static GoogleMap mMap;
     SupportMapFragment mapFragment;
     FusedLocationProviderClient fusedLocationProviderClient;
-    LocationDriver currentLocation = new LocationDriver();
-
+    Driver driver = null;
+    static Marker locationMarker;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mView = inflater.inflate(R.layout.fragment_home, container, false);
 
+        driver = (Driver) getArguments().get("object_driver");
         mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
         getCurrentLocation();
-//        direction2();
         return mView;
     }
 
@@ -71,12 +75,9 @@ public class FragmentHome extends Fragment implements OnMapReadyCallback {
                             mapFragment.getMapAsync(new OnMapReadyCallback() {
                                 @Override
                                 public void onMapReady(@NonNull GoogleMap googleMap) {
-                                    LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-                                    MarkerOptions options = new MarkerOptions().position(latLng);
-                                    googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
-                                    googleMap.addMarker(options);
-                                    currentLocation.setLatitude(location.getLatitude());
-                                    currentLocation.setLongitude(location.getLongitude());
+                                    updateLocationMarker(2,new LatLng(location.getLatitude(), location.getLongitude()), driver.getType());
+//                                    currentLocation.setLatitude(location.getLatitude());
+//                                    currentLocation.setLongitude(location.getLongitude());
                                 }
                             });
                         }
@@ -85,5 +86,23 @@ public class FragmentHome extends Fragment implements OnMapReadyCallback {
     }
 
 
+    public static void updateLocationMarker(int typeOfUser, LatLng latLng, int typeOfVehicle){
+        if(locationMarker == null){
+            MarkerOptions markerOptions = new MarkerOptions();
+            markerOptions.position(latLng);
+            if(typeOfUser==2){
+                if(typeOfVehicle==1){
+                    markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.motor_marker));
+                }else{
+                    markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.car_marker));
+                }
+            }
+            locationMarker = mMap.addMarker(markerOptions);
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
+        }else{
+            locationMarker.setPosition(latLng);
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
+        }
+    }
 
 }

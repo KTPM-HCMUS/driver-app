@@ -18,7 +18,7 @@ import io.grpc.stub.StreamObserver;
 public class LocationStreamingClient {
     private static final String TAG = "LocationStreamingClient";
     private final ManagedChannel channel = ManagedChannelBuilder
-            .forAddress("192.168.2.210", 8089)
+            .forAddress("34.69.185.55", 8089)
             .usePlaintext()
             .enableRetry()
             .enableFullStreamDecompression()

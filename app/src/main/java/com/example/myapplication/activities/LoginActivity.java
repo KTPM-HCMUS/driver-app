@@ -100,11 +100,11 @@ public class LoginActivity extends AppCompatActivity {
     }
 
 
-    private void moveToMainPage(Driver driver){
+    private void moveToMainPage(Driver driver, String token){
         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
         Bundle bundle = new Bundle();
         bundle.putSerializable("object_driver_init", driver);
-        bundle.putSerializable("token", handler.readDB().get(1));
+        bundle.putSerializable("token", token);
         intent.putExtras(bundle);
         startActivity(intent);
     }
@@ -131,14 +131,19 @@ public class LoginActivity extends AppCompatActivity {
 
     private void success(Response<ResponseTT> response){
         ArrayList<String> s = handler.readDB();
-        Driver driver = JWTUtils.parseTokenToGetDriver(s.get(1));
+        Driver driver = null;
+        if(s.size() == 0){
+            driver = JWTUtils.parseTokenToGetDriver(response.body().getResult().getToken());
+        }else{
+            driver = JWTUtils.parseTokenToGetDriver(s.get(1));
+        }
         try {
             String isValid = response.body().getResult().getLoginError();
             String refreshToken = response.body().getResult().getRefreshToken();
             String token = response.body().getResult().getToken();
             if(isValid.equals("SUCCESS")){
                 writeDB(refreshToken, token, isValid);
-                moveToMainPage(driver);
+                moveToMainPage(driver, token);
             }else{
                 if(s.size() != 0){
                     getRefreshToken(driver.getUserId());
