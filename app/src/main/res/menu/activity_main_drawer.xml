@@ -13,6 +13,10 @@
             android:icon="@drawable/ic_person_nav"
             android:title="Profile" />
         <item
+            android:id="@+id/nav_tracking"
+            android:icon="@drawable/tracking"
+            android:title="Tracking"/>
+        <item
             android:id="@+id/history"
             android:icon="@drawable/ic_baseline_history_24"
             android:title="History" />

@@ -43,17 +43,23 @@ public class StreamingLocationUtils {
         }, executorService);
     }
 
-    public static void getLocationID(String customerId, String driverId, int typeOfVehicle, ExecutorService executorService, LatLng destination, Activity activity) {
+    public static void getLocationID(String customerId, String driverId, int typeOfVehicle, ExecutorService executorService, LatLng destination, Activity activity, ExecutorService executorService1, ExecutorService executorService2) {
         Log.d("TAG123", "A,B " );
         client.getLocation(customerId, driverId, response -> {
             Log.d("TAG123", response.getDriverLocation().getLatitude() + ", " + response.getDriverLocation().getLongitude());
-            if(CalculatingDistance.distance(response.getDriverLocation().getLatitude(), response.getDriverLocation().getLongitude(),
-                    response.getCustomerLocation().getLatitude(), response.getCustomerLocation().getLongitude(), 'M') < 0.05)
-            FragmentHome.mMap.clear();
-            LatLng latLng =  new LatLng(response.getCustomerLocation().getLatitude(), response.getCustomerLocation().getLongitude());
-            FragmentHome.updateLocationMarker(2, latLng, typeOfVehicle);
-            FragmentHome.updateLocationMarker(1, destination, typeOfVehicle);
-            GMapUtils.direction(latLng, destination, FragmentHome.mMap, activity);
+            double distance = CalculatingDistance.distance(response.getDriverLocation().getLatitude(), response.getDriverLocation().getLongitude(),
+                    response.getCustomerLocation().getLatitude(), response.getCustomerLocation().getLongitude(), 'M');
+            if(distance < 0.05D) {
+//                FragmentHome.mMap.clear();
+                executorService1.shutdown();
+                executorService2.shutdown();
+                LatLng latLng = new LatLng(response.getCustomerLocation().getLatitude(), response.getCustomerLocation().getLongitude());
+                FragmentHome.updateLocationMarker(2, latLng, typeOfVehicle);
+                FragmentHome.updateLocationMarker(1, destination, typeOfVehicle);
+            }
+//                GMapUtils.direction(latLng, destination, FragmentHome.mMap, activity);
+//            }
+
 //            FragmentHome.updateLocationMarker(2, new LatLng(response.getDriverLocation().getLatitude(), response.getDriverLocation().getLongitude()), typeOfVehicle);
 //            FragmentHome.updateLocationMarker(1, new LatLng(response.getCustomerLocation().getLatitude(), response.getCustomerLocation().getLongitude()), 0);
         }, executorService);

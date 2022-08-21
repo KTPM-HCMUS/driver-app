@@ -9,27 +9,23 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
-import android.app.job.JobInfo;
-import android.app.job.JobScheduler;
-import android.content.ComponentName;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Looper;
-import android.os.PersistableBundle;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 
 import com.example.myapplication.R;
 import com.example.myapplication.api.ApiService;
+import com.example.myapplication.fragment.FragmentTracking;
 import com.example.myapplication.fragment.FragmentHome;
 import com.example.myapplication.fragment.FragmentProfile;
+import com.example.myapplication.fragment.FragmentTrackingEmpty;
 import com.example.myapplication.fragment.MyBottomSheetDialogFragment;
 import com.example.myapplication.model.Driver;
 import com.example.myapplication.model.LocationDriver;
@@ -44,18 +40,11 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResponse;
 import com.google.android.gms.location.SettingsClient;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
-import com.google.gson.Gson;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -73,6 +62,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private static LocationDriver locationDriver;
     private FusedLocationProviderClient fusedLocationProviderClient;
     private Bundle bundleDriver;
+    Fragment fragmentHome;
     ExecutorService sendDriverLocationExecutor = Executors.newSingleThreadExecutor();
     ExecutorService sendClientLocationExecutor = Executors.newSingleThreadExecutor();
     ExecutorService getLocationExcutor = Executors.newSingleThreadExecutor();
@@ -116,12 +106,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         bundleDriver = getBundleDriver();
 
         //main fragment
-        Fragment fragment = new FragmentHome();
-        fragment.setArguments(bundleDriver);
+        fragmentHome = new FragmentHome();
+        fragmentHome.setArguments(bundleDriver);
         if(savedInstanceState == null){
             getSupportFragmentManager()
                     .beginTransaction()
-                    .replace(R.id.frame_layout, fragment)
+                    .replace(R.id.frame_layout, fragmentHome)
+                    .addToBackStack(null)
                     .commit();
             navigationView.setCheckedItem(R.id.nav_driver_home);
         }
@@ -162,7 +153,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             case R.id.nav_driver_home:
                 getSupportFragmentManager()
                         .beginTransaction()
-                        .replace(R.id.frame_layout, new FragmentHome())
+                        .replace(R.id.frame_layout, fragmentHome)
+                        .addToBackStack(null)
                         .commit();
                 break;
             case R.id.nav_profile:
@@ -171,6 +163,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 getSupportFragmentManager()
                         .beginTransaction()
                         .replace(R.id.frame_layout, fragmentProfile)
+                        .addToBackStack(null)
+                        .commit();
+                break;
+
+            case R.id.nav_tracking:
+                Fragment fragment;
+                if(locationDriver == null || locationResponse == null){
+                    fragment = new FragmentTrackingEmpty();
+                }else{
+                    fragment = new FragmentTracking();
+                    fragment.setArguments(setBundleDriverAndClient());
+                }
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.frame_layout,fragment)
+                        .addToBackStack(null)
                         .commit();
                 break;
         }
@@ -229,7 +237,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     StreamingLocationUtils.sendLocation(sendDriverLocationExecutor, locationDriver.getDriverID());
                     StreamingLocationUtils.sendLocationClient(sendClientLocationExecutor, "0868944407", new LatLng(10.762764014796876,106.68237984134088));
                     StreamingLocationUtils.getLocationID("0868944407", locationDriver.getDriverID(), locationDriver.getTypeOfVehicle(),
-                            getLocationExcutor, new LatLng(locationResponse.getLocationClient().getLatitudeDestination(), locationResponse.getLocationClient().getLongitudeDestination()),MainActivity.this);
+                            getLocationExcutor, new LatLng(locationResponse.getLocationClient().getLatitudeDestination(), locationResponse.getLocationClient().getLongitudeDestination()),MainActivity.this, sendDriverLocationExecutor, sendClientLocationExecutor);
                     showBottomDialog();
                 }
             }
@@ -265,6 +273,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return null;
     }
 
+    private Bundle setBundleDriverAndClient(){
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("object_driver_information", locationDriver);
+        bundle.putSerializable("object_client_information", locationResponse);
+        return bundle;
+    }
     private void showBottomDialog(){
         if(locationResponse==null) return;
         MyBottomSheetDialogFragment myBottomSheetDialogFragment = MyBottomSheetDialogFragment.newInstance(locationResponse, locationDriver);
