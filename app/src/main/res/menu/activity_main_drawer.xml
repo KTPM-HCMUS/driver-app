@@ -17,7 +17,7 @@
             android:icon="@drawable/tracking"
             android:title="Tracking"/>
         <item
-            android:id="@+id/history"
+            android:id="@+id/nav_history"
             android:icon="@drawable/ic_baseline_history_24"
             android:title="History" />
     </group>

@@ -66,6 +66,7 @@ public class MyBottomSheetDialogFragment extends BottomSheetDialogFragment {
                         new LatLng(locationDriver.getLatitude(), locationDriver.getLongitude()), FragmentHome.mMap, getActivity());
             }
         });
+//        GMapUtils.polylineFinal.remove();
 
 //        BottomSheetBehavior behavior = BottomSheetBehavior.from((View)view.getParent());
 //        behavior.setPeekHeight(150);

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="10dp"
+    android:id="@+id/item_history"
+    android:layout_marginTop="10dp"
+    android:layout_marginEnd="10dp">
+    <ImageView
+        android:layout_width="60dp"
+        android:id="@+id/img_avatar"
+        android:layout_height="60dp"
+        android:src="@drawable/app_avatar"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@+id/img_avatar"
+        android:layout_marginStart="10dp"
+        android:layout_centerVertical="true"
+        android:orientation="vertical">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="135B Trần Hung Đạo, Quận 2"
+            android:textColor="@android:color/black"
+            android:textSize="16sp"
+            android:id="@+id/address_history"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Tổng tiền: 41.000VND"
+            android:textColor="@android:color/black"
+            android:textSize="16sp"
+            android:id="@+id/price_history"
+            />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="13/07/2022 - 12:14"
+            android:textColor="@android:color/darker_gray"
+            android:textSize="14sp"
+            android:id="@+id/time_history"
+            />
+
+
+    </LinearLayout>
+
+</RelativeLayout>

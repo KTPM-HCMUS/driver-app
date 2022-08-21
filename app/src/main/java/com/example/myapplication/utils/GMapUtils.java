@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GMapUtils {
+    public static Polyline polylineFinal;
     public static void direction(LatLng address1, LatLng address2, GoogleMap mMap, Activity context){
         RequestQueue requestQueue = Volley.newRequestQueue(context);
         String url = Uri.parse("https://maps.googleapis.com/maps/api/directions/json")
@@ -66,7 +67,7 @@ public class GMapUtils {
                             polylineOptions.color(ContextCompat.getColor(context, R.color.red));
                             polylineOptions.geodesic(true);
                         }
-                        mMap.addPolyline(polylineOptions);
+                        polylineFinal = mMap.addPolyline(polylineOptions);
                         mMap.addMarker(new MarkerOptions().position(new LatLng(address1.latitude, address1.longitude)));
                         mMap.addMarker(new MarkerOptions().position(new LatLng(address2.latitude, address2.longitude)));
 

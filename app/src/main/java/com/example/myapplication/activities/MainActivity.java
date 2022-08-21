@@ -9,6 +9,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.Manifest;
 import android.content.IntentSender;
@@ -22,12 +23,15 @@ import android.view.View;
 
 import com.example.myapplication.R;
 import com.example.myapplication.api.ApiService;
+import com.example.myapplication.fragment.DetailFragment;
+import com.example.myapplication.fragment.FragmentHistory;
 import com.example.myapplication.fragment.FragmentTracking;
 import com.example.myapplication.fragment.FragmentHome;
 import com.example.myapplication.fragment.FragmentProfile;
 import com.example.myapplication.fragment.FragmentTrackingEmpty;
 import com.example.myapplication.fragment.MyBottomSheetDialogFragment;
 import com.example.myapplication.model.Driver;
+import com.example.myapplication.model.ItemHistory;
 import com.example.myapplication.model.LocationDriver;
 import com.example.myapplication.model.LocationResponse;
 import com.example.myapplication.utils.StreamingLocationUtils;
@@ -181,6 +185,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         .addToBackStack(null)
                         .commit();
                 break;
+            case R.id.nav_history:
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.frame_layout, new FragmentHistory())
+                        .addToBackStack(null)
+                        .commit();
+                break;
         }
         drawerLayout.closeDrawer(GravityCompat.START);
         return true;
@@ -288,5 +299,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     public static LatLng getDriverForStream(){
         return new LatLng(locationDriver.getLatitude(), locationDriver.getLongitude());
+    }
+
+    public void goToDetailFragment(ItemHistory itemHistory){
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        DetailFragment detailFragment = new DetailFragment();
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("object_history_item", itemHistory);
+        detailFragment.setArguments(bundle);
+        fragmentTransaction.replace(R.id.frame_layout, detailFragment);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
     }
 }
