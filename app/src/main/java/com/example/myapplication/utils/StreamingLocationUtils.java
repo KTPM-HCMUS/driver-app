@@ -30,7 +30,7 @@ public class StreamingLocationUtils {
 
     public static void sendLocationClient(ExecutorService executorService, String clientId, LatLng location) {
         client.sendLocation(clientId, () -> {
-            Log.d("TAGCLIENT", location.latitude + "," + location.longitude);
+            Log.d("TAGaaaa", location.latitude + "," + location.longitude);
             return LocationOuterClass.Location.newBuilder()
                     .setLatitude(location.latitude)
                     .setLongitude(location.longitude)
@@ -38,22 +38,9 @@ public class StreamingLocationUtils {
         }, executorService);
     }
 
-    public static void getLocationID(String customerId, String driverId, int typeOfVehicle, ExecutorService executorService, LatLng destination, Activity activity, ExecutorService executorService1, ExecutorService executorService2) {
-        client.getLocation(customerId, driverId, response -> {
-            Log.d("TAG123", response.getDriverLocation().getLatitude() + ", " + response.getDriverLocation().getLongitude());
-            double distance = CalculatingDistance.distance(response.getDriverLocation().getLatitude(), response.getDriverLocation().getLongitude(),
-                    response.getCustomerLocation().getLatitude(), response.getCustomerLocation().getLongitude(), 'M');
-            if(distance < 0.05D) {
-                if(GMapUtils.polylineFinal!=null){
-                    GMapUtils.polylineFinal.remove();
-                }
-                executorService1.shutdown();
-                executorService2.shutdown();
-                GMapUtils.direction(new LatLng(response.getDriverLocation().getLatitude(), response.getDriverLocation().getLongitude()), destination, FragmentHome.mMap, activity);
-                LatLng latLng = new LatLng(response.getCustomerLocation().getLatitude(), response.getCustomerLocation().getLongitude());
-                FragmentHome.updateLocationMarker(2, latLng, typeOfVehicle);
-                FragmentHome.updateLocationMarker(1, destination, typeOfVehicle);
-            }
-            }, executorService);
-    }
+//    public static void getLocationID(String customerId, String driverId, int typeOfVehicle, ExecutorService executorService, LatLng destination, Activity activity, ExecutorService executorService1, ExecutorService executorService2) {
+//        client.getLocation(customerId, driverId, response -> {
+//
+//            }, executorService);
+//    }
 }

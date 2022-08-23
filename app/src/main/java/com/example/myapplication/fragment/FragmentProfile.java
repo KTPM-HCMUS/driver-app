@@ -3,6 +3,8 @@ package com.example.myapplication.fragment;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,13 +12,21 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.myapplication.R;
+import com.example.myapplication.adapter.HistoryAdapter;
+import com.example.myapplication.adapter.ViewModelHistory;
+import com.example.myapplication.adapter.ViewModelProfile;
+import com.example.myapplication.model.BookingItem;
 import com.example.myapplication.model.Driver;
+import com.example.myapplication.model.Total;
 import com.google.android.material.textfield.TextInputEditText;
+
+import java.util.List;
 
 public class FragmentProfile extends Fragment {
     private View mView;
-    private TextView fullName;
+    private TextView fullName,  payment, booking;
     private TextInputEditText fullNameEdt, phoneNumberEdt, dobEdt, emailEdt, typeEdt, plateEdt;
+    private ViewModelProfile viewModel;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -29,8 +39,19 @@ public class FragmentProfile extends Fragment {
         emailEdt = (TextInputEditText) mView.findViewById(R.id.email_id);
         typeEdt = (TextInputEditText) mView.findViewById(R.id.type_of_vehicle);
         plateEdt = (TextInputEditText) mView.findViewById(R.id.vehicle_plate);
+        payment = mView.findViewById(R.id.payment_label);
+        booking = mView.findViewById(R.id.booking_label);
 
         setTextForAllField();
+
+        viewModel = new ViewModelProvider(this).get(ViewModelProfile.class);
+        viewModel.getTotalLiveDate().observe(getViewLifecycleOwner(), new Observer<List<Double>>() {
+            @Override
+            public void onChanged(List<Double> totals) {
+                payment.setText(totals.get(0).toString() + "VND");
+                booking.setText(String.valueOf(totals.get(1).intValue()));
+            }
+        });
         return mView;
     }
 

@@ -22,6 +22,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.example.myapplication.R;
+import com.example.myapplication.api.ApiBooking;
 import com.example.myapplication.api.ApiService;
 import com.example.myapplication.fragment.DetailFragment;
 import com.example.myapplication.fragment.FragmentHistory;
@@ -30,10 +31,12 @@ import com.example.myapplication.fragment.FragmentHome;
 import com.example.myapplication.fragment.FragmentProfile;
 import com.example.myapplication.fragment.FragmentTrackingEmpty;
 import com.example.myapplication.fragment.MyBottomSheetDialogFragment;
+import com.example.myapplication.model.BookingItem;
 import com.example.myapplication.model.Driver;
-import com.example.myapplication.model.ItemHistory;
 import com.example.myapplication.model.LocationDriver;
 import com.example.myapplication.model.LocationResponse;
+import com.example.myapplication.utils.CalculatingDistance;
+import com.example.myapplication.utils.GMapUtils;
 import com.example.myapplication.utils.StreamingLocationUtils;
 import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -50,6 +53,8 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -63,15 +68,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private SwitchCompat switchCompat;
     private LocationRequest locationRequest;
     private LocationResponse locationResponse;
-    private static LocationDriver locationDriver;
+    public static LocationDriver locationDriver;
     private FusedLocationProviderClient fusedLocationProviderClient;
     private Bundle bundleDriver;
     Fragment fragmentHome;
     ExecutorService sendDriverLocationExecutor = Executors.newSingleThreadExecutor();
     ExecutorService sendClientLocationExecutor = Executors.newSingleThreadExecutor();
-    ExecutorService getLocationExcutor = Executors.newSingleThreadExecutor();
-
-
+    private boolean isFlag = true;
 
     LocationCallback locationCallback = new LocationCallback() {
         @Override
@@ -82,7 +85,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 locationDriver.setLongitude(location.getLongitude());
                 locationDriver.setLatitude(location.getLatitude());
                 updateLocationDriver();
-                FragmentHome.updateLocationMarker(driver.getRole(), new LatLng(location.getLatitude(), location.getLongitude()), locationDriver.getTypeOfVehicle());
+                FragmentHome.updateLocationMarker(driver.getRole(), new LatLng(location.getLatitude(), location.getLongitude()), locationDriver.getTypeOfVehicle(), location.getBearing());
+                deleteAndUpdateRoute(location.getLatitude(),
+                        location.getLongitude(),
+                        10.7627,106.6823,
+                        new LatLng(10.779382145655743, 106.66509467017718));
             }
         }
     };
@@ -186,9 +193,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         .commit();
                 break;
             case R.id.nav_history:
+                Fragment fragmentHistory = new FragmentHistory();
                 getSupportFragmentManager()
                         .beginTransaction()
-                        .replace(R.id.frame_layout, new FragmentHistory())
+                        .replace(R.id.frame_layout, fragmentHistory)
                         .addToBackStack(null)
                         .commit();
                 break;
@@ -246,9 +254,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     locationResponse = (LocationResponse) response.body();
                     locationDriver.setStatus("MATCHED");
                     StreamingLocationUtils.sendLocation(sendDriverLocationExecutor, locationDriver.getDriverID());
-                    StreamingLocationUtils.sendLocationClient(sendClientLocationExecutor, "0868944407", new LatLng(10.762764014796876,106.68237984134088));
-                    StreamingLocationUtils.getLocationID("0868944407", locationDriver.getDriverID(), locationDriver.getTypeOfVehicle(),
-                            getLocationExcutor, new LatLng(locationResponse.getLocationClient().getLatitudeDestination(), locationResponse.getLocationClient().getLongitudeDestination()),MainActivity.this, sendDriverLocationExecutor, sendClientLocationExecutor);
+                    StreamingLocationUtils.sendLocationClient(sendClientLocationExecutor, "0868944407", new LatLng(10.7627,106.6823));
                     showBottomDialog();
                 }
             }
@@ -301,14 +307,33 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return new LatLng(locationDriver.getLatitude(), locationDriver.getLongitude());
     }
 
-    public void goToDetailFragment(ItemHistory itemHistory){
+    public void goToDetailFragment(BookingItem bookingItem){
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         DetailFragment detailFragment = new DetailFragment();
         Bundle bundle = new Bundle();
-        bundle.putSerializable("object_history_item", itemHistory);
+        bundle.putSerializable("object_history_item", bookingItem);
         detailFragment.setArguments(bundle);
         fragmentTransaction.replace(R.id.frame_layout, detailFragment);
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
     }
+
+    private void deleteAndUpdateRoute(Double lat1, Double lon1, Double lat2, Double lon2, LatLng destination){
+        double distance = CalculatingDistance.distance(lat1, lon1, lat2, lon2, 'M');
+        Log.d("TAG123", String.valueOf(distance));
+        if(distance*100 < 5) {
+            if(GMapUtils.polylineFinal!=null&&isFlag){
+                LatLng latLng2 = new LatLng(lat2, lon2);
+                MainActivity.locationDriver.setStatus("WORKING");
+                GMapUtils.deleteRoute();
+                GMapUtils.direction(latLng2, destination, FragmentHome.mMap, this);
+//                FragmentHome.updateLocationMarker(1, latLng2, -1, 0);
+//                FragmentHome.updateLocationMarker(1, destination, -1, 0);
+                isFlag = false;
+            }
+
+        }
+    }
+
+
 }

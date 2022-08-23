@@ -60,16 +60,12 @@ public class MyBottomSheetDialogFragment extends BottomSheetDialogFragment {
         btn_confirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                bottomSheetDialog.dismiss();
                 GMapUtils.direction(new LatLng(locationResponse.getLocationClient().getLatitudeDepart(),
                                                 locationResponse.getLocationClient().getLongitudeDepart()),
                         new LatLng(locationDriver.getLatitude(), locationDriver.getLongitude()), FragmentHome.mMap, getActivity());
+                bottomSheetDialog.dismiss();
             }
         });
-//        GMapUtils.polylineFinal.remove();
-
-//        BottomSheetBehavior behavior = BottomSheetBehavior.from((View)view.getParent());
-//        behavior.setPeekHeight(150);
 
         return  bottomSheetDialog;
     }

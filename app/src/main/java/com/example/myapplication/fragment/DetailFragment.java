@@ -12,7 +12,10 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.myapplication.R;
-import com.example.myapplication.model.ItemHistory;
+import com.example.myapplication.model.BookingItem;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class DetailFragment extends Fragment {
     private TextView phone, name, price, addressDepart, addressDestination, time, method;
@@ -27,21 +30,26 @@ public class DetailFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mView = inflater.inflate(R.layout.fragment_detail, container, false);
-//        phone = mView.findViewById(R.id.phone_detail);
-//        name = mView.findViewById(R.id.name_detail);
+        phone = mView.findViewById(R.id.phone_detail);
+        name = mView.findViewById(R.id.name_detail);
         price = mView.findViewById(R.id.price_detail);
         addressDepart = mView.findViewById(R.id.depart_detail);
-//        addressDestination = mView.findViewById(R.id.destination_detail);
+       addressDestination = mView.findViewById(R.id.destination_detail);
         time = mView.findViewById(R.id.time_detail);
         btn = mView.findViewById(R.id.btn_back_detail);
 
         Bundle bundle = getArguments();
         if(bundle != null){
-            ItemHistory itemHistory = (ItemHistory) bundle.get("object_history_item");
+            BookingItem itemHistory = (BookingItem) bundle.get("object_history_item");
             if(itemHistory != null){
+                Date date = new Date(itemHistory.getTimeStamp());
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy' 'HH:mm:ss");
                 price.setText(itemHistory.getPrice());
-                addressDepart.setText(itemHistory.getAddress());
-                time.setText(itemHistory.getTime());
+                addressDepart.setText(itemHistory.getAddressDepart());
+                time.setText(simpleDateFormat.format(date));
+                name.setText(itemHistory.getName());
+                addressDestination.setText(itemHistory.getAddressDestination());
+                phone.setText(itemHistory.getPhoneNumber());
             }
         }
 

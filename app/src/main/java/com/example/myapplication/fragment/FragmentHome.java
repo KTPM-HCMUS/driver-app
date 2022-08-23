@@ -76,7 +76,7 @@ public class FragmentHome extends Fragment implements OnMapReadyCallback {
                             mapFragment.getMapAsync(new OnMapReadyCallback() {
                                 @Override
                                 public void onMapReady(@NonNull GoogleMap googleMap) {
-                                    updateLocationMarker(2,new LatLng(location.getLatitude(), location.getLongitude()), driver.getType());
+                                    updateLocationMarker(2,new LatLng(location.getLatitude(), location.getLongitude()), driver.getType(),0);
 //                                    currentLocation.setLatitude(location.getLatitude());
 //                                    currentLocation.setLongitude(location.getLongitude());
                                 }
@@ -87,10 +87,14 @@ public class FragmentHome extends Fragment implements OnMapReadyCallback {
     }
 
 
-    public static void updateLocationMarker(int typeOfUser, LatLng latLng, int typeOfVehicle){
+    public static void updateLocationMarker(int typeOfUser, LatLng latLng, int typeOfVehicle, float bearing){
         if(locationMarker == null){
             MarkerOptions markerOptions = new MarkerOptions();
             markerOptions.position(latLng);
+            if(bearing!=0){
+                markerOptions.rotation(bearing);
+                markerOptions.anchor((float) 0.5, (float) 0.5);
+            }
             if(typeOfUser==2){
                 if(typeOfVehicle==1){
                     markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.motor_marker));
@@ -102,6 +106,9 @@ public class FragmentHome extends Fragment implements OnMapReadyCallback {
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
         }else{
             locationMarker.setPosition(latLng);
+            if(bearing!=0){
+                locationMarker.setRotation(bearing);
+            }
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
         }
     }

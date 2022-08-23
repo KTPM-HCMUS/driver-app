@@ -10,20 +10,22 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.myapplication.R;
-import com.example.myapplication.model.ItemHistory;
+import com.example.myapplication.model.BookingItem;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryViewHolder>{
-    private List<ItemHistory> list;
+    private List<BookingItem> list;
     public IClickItemListener iClickItemListener;
-    public HistoryAdapter(List<ItemHistory> mList, IClickItemListener listener){
+    public HistoryAdapter(List<BookingItem> mList, IClickItemListener listener){
         this.list = mList;
         this.iClickItemListener = listener;
     }
 
     public interface IClickItemListener{
-        void onClickItem(ItemHistory itemHistory);
+        void onClickItem(BookingItem bookingItem);
     }
     @NonNull
     @Override
@@ -34,13 +36,15 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
 
     @Override
     public void onBindViewHolder(@NonNull HistoryViewHolder holder, int position) {
-        ItemHistory itemHistory = list.get(position);
+        BookingItem itemHistory = list.get(position);
         if(itemHistory == null){
             return;
         }
-        holder.price.setText(itemHistory.getPrice());
-        holder.address.setText(itemHistory.getAddress());
-        holder.time.setText(itemHistory.getTime());
+        Date date = new Date(itemHistory.getTimeStamp());
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy' 'HH:mm:ss");
+        holder.price.setText("Tổng tiền: " + itemHistory.getPrice());
+        holder.address.setText(itemHistory.getAddressDepart());
+        holder.time.setText(simpleDateFormat.format(date));
         holder.layout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

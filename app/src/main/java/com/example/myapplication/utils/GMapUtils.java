@@ -20,6 +20,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
@@ -31,9 +32,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GMapUtils {
-    public static Polyline polylineFinal;
+    public static ArrayList<Polyline> polylineFinal;
+    public static Marker markerCurrent, markerDestination;
     public static void direction(LatLng address1, LatLng address2, GoogleMap mMap, Activity context){
         RequestQueue requestQueue = Volley.newRequestQueue(context);
+        polylineFinal = new ArrayList<>();
+        markerCurrent = null;
+        markerDestination = null;
         String url = Uri.parse("https://maps.googleapis.com/maps/api/directions/json")
                 .buildUpon()
                 .appendQueryParameter("destination", address1.latitude + "," + address1.longitude)
@@ -67,9 +72,9 @@ public class GMapUtils {
                             polylineOptions.color(ContextCompat.getColor(context, R.color.red));
                             polylineOptions.geodesic(true);
                         }
-                        polylineFinal = mMap.addPolyline(polylineOptions);
-                        mMap.addMarker(new MarkerOptions().position(new LatLng(address1.latitude, address1.longitude)));
-                        mMap.addMarker(new MarkerOptions().position(new LatLng(address2.latitude, address2.longitude)));
+                        polylineFinal.add(mMap.addPolyline(polylineOptions));
+                        markerCurrent = mMap.addMarker(new MarkerOptions().position(new LatLng(address1.latitude, address1.longitude)));
+                        markerDestination = mMap.addMarker(new MarkerOptions().position(new LatLng(address2.latitude, address2.longitude)));
 
                         LatLngBounds bounds = new LatLngBounds.Builder()
                                 .include(new LatLng(address1.latitude, address1.longitude))
@@ -128,5 +133,20 @@ public class GMapUtils {
         }
 
         return poly;
+    }
+
+    public static void deleteRoute(){
+        for(Polyline polyline : polylineFinal){
+            polyline.remove();
+        }
+        polylineFinal.clear();
+        if(markerCurrent != null){
+            markerCurrent.remove();
+            markerCurrent = null;
+        }
+        if(markerDestination != null){
+            markerDestination.remove();
+            markerDestination = null;
+        }
     }
 }
